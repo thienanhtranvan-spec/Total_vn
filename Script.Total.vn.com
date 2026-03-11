@@ -1,4 +1,3 @@
-lua
 -- TOTAL HUB v1.000001 - by Thiên Anh
 local repo = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/'
 local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
@@ -106,7 +105,6 @@ CBox2:AddToggle('InfStamina',{Text='Thể Lực Vô Hạn',Default=false,Callbac
             local n=val.Name:lower() if n:find("stamina") or n:find("energy") or n:find("mana") then val.Value=100 end end end end)
     else C("Stam") end end})
 CBox2:AddButton('Tự Sát',function() local h=GetH() if h then h.Health=0 end end)
-lua
 local VBox=Tabs.Visual:AddLeftGroupbox('ESP')
 local ESPFolder=Instance.new("Folder") ESPFolder.Name="ESP_TH" ESPFolder.Parent=workspace
 local function MakeESP(p)
