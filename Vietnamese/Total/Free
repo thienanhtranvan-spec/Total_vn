@@ -1,0 +1,109 @@
+local Players=game:GetService("Players")
+local RS=game:GetService("RunService")
+local UIS=game:GetService("UserInputService")
+local Player=Players.LocalPlayer
+local Conn={} local S={}
+local function C(k) if Conn[k] then Conn[k]:Disconnect() Conn[k]=nil end end
+local function GetH() local c=Player.Character return c and c:FindFirstChildOfClass("Humanoid") end
+local function GetR() local c=Player.Character return c and c:FindFirstChild("HumanoidRootPart") end
+local SG=Instance.new("ScreenGui") SG.ResetOnSpawn=false SG.ZIndexBehavior=Enum.ZIndexBehavior.Sibling SG.Parent=game:GetService("CoreGui")
+local Main=Instance.new("Frame",SG) Main.Size=UDim2.new(0,300,0,460) Main.Position=UDim2.new(0.5,-150,0.5,-230) Main.BackgroundColor3=Color3.fromRGB(0,20,40) Main.BorderSizePixel=0 Main.Active=true Main.Draggable=true
+Instance.new("UICorner",Main).CornerRadius=UDim.new(0,10)
+Instance.new("UIStroke",Main).Color=Color3.fromRGB(0,120,255)
+local TitleL=Instance.new("TextLabel",Main) TitleL.Size=UDim2.new(1,0,0,36) TitleL.BackgroundColor3=Color3.fromRGB(0,35,70) TitleL.BorderSizePixel=0 TitleL.Text="✦ THIÊN ANH ✦" TitleL.TextColor3=Color3.fromRGB(0,180,255) TitleL.Font=Enum.Font.GothamBold TitleL.TextScaled=true
+Instance.new("UICorner",TitleL).CornerRadius=UDim.new(0,10)
+local MinBtn=Instance.new("TextButton",Main) MinBtn.Size=UDim2.new(0,24,0,24) MinBtn.Position=UDim2.new(1,-28,0,6) MinBtn.BackgroundColor3=Color3.fromRGB(0,80,180) MinBtn.Text="—" MinBtn.TextColor3=Color3.new(1,1,1) MinBtn.Font=Enum.Font.GothamBold MinBtn.TextScaled=true MinBtn.BorderSizePixel=0
+Instance.new("UICorner",MinBtn).CornerRadius=UDim.new(0,6)
+local Body=Instance.new("ScrollingFrame",Main) Body.Size=UDim2.new(1,-10,1,-44) Body.Position=UDim2.new(0,5,0,40) Body.BackgroundTransparency=1 Body.BorderSizePixel=0 Body.ScrollBarThickness=3 Body.ScrollBarImageColor3=Color3.fromRGB(0,120,255) Body.AutomaticCanvasSize=Enum.AutomaticSize.Y Body.CanvasSize=UDim2.new(0,0,0,0)
+local Layout=Instance.new("UIListLayout",Body) Layout.Padding=UDim.new(0,5) Layout.SortOrder=Enum.SortOrder.LayoutOrder
+Instance.new("UIPadding",Body).PaddingLeft=UDim.new(0,2)
+local menuOpen=true
+MinBtn.MouseButton1Click:Connect(function()
+    menuOpen=not menuOpen Body.Visible=menuOpen
+    Main.Size=menuOpen and UDim2.new(0,300,0,460) or UDim2.new(0,300,0,36)
+    MinBtn.Text=menuOpen and "—" or "+"
+end)
+local function MakeToggle(name,cb)
+    local state=false
+    local f=Instance.new("Frame",Body) f.Size=UDim2.new(1,-4,0,34) f.BackgroundColor3=Color3.fromRGB(0,30,55) f.BorderSizePixel=0
+    Instance.new("UICorner",f).CornerRadius=UDim.new(0,7)
+    Instance.new("UIStroke",f).Color=Color3.fromRGB(0,70,140)
+    local lbl=Instance.new("TextLabel",f) lbl.Size=UDim2.new(1,-50,1,0) lbl.Position=UDim2.new(0,8,0,0) lbl.BackgroundTransparency=1 lbl.Text=name lbl.TextColor3=Color3.fromRGB(200,230,255) lbl.Font=Enum.Font.Gotham lbl.TextScaled=true lbl.TextXAlignment=Enum.TextXAlignment.Left
+    local btn=Instance.new("TextButton",f) btn.Size=UDim2.new(0,44,0,22) btn.Position=UDim2.new(1,-48,0.5,-11) btn.BackgroundColor3=Color3.fromRGB(0,60,120) btn.Text="OFF" btn.TextColor3=Color3.fromRGB(180,180,180) btn.Font=Enum.Font.GothamBold btn.TextScaled=true btn.BorderSizePixel=0
+    Instance.new("UICorner",btn).CornerRadius=UDim.new(0,6)
+    btn.MouseButton1Click:Connect(function()
+        state=not state
+        btn.Text=state and "ON" or "OFF"
+        btn.BackgroundColor3=state and Color3.fromRGB(0,180,80) or Color3.fromRGB(0,60,120)
+        btn.TextColor3=state and Color3.new(1,1,1) or Color3.fromRGB(180,180,180)
+        cb(state)
+    end)
+end
+local function MakeButton(name,cb)
+    local btn=Instance.new("TextButton",Body) btn.Size=UDim2.new(1,-4,0,34) btn.BackgroundColor3=Color3.fromRGB(0,50,100) btn.Text=name btn.TextColor3=Color3.fromRGB(200,230,255) btn.Font=Enum.Font.GothamBold btn.TextScaled=true btn.BorderSizePixel=0
+    Instance.new("UICorner",btn).CornerRadius=UDim.new(0,7)
+    Instance.new("UIStroke",btn).Color=Color3.fromRGB(0,100,200)
+    btn.MouseButton1Click:Connect(cb)
+end
+local function MakeInput(label,default,onSet,onReset)
+    local f=Instance.new("Frame",Body) f.Size=UDim2.new(1,-4,0,34) f.BackgroundColor3=Color3.fromRGB(0,30,55) f.BorderSizePixel=0
+    Instance.new("UICorner",f).CornerRadius=UDim.new(0,7)
+    Instance.new("UIStroke",f).Color=Color3.fromRGB(0,70,140)
+    local lbl=Instance.new("TextLabel",f) lbl.Size=UDim2.new(0,80,1,0) lbl.Position=UDim2.new(0,6,0,0) lbl.BackgroundTransparency=1 lbl.Text=label lbl.TextColor3=Color3.fromRGB(200,230,255) lbl.Font=Enum.Font.Gotham lbl.TextScaled=true lbl.TextXAlignment=Enum.TextXAlignment.Left
+    local box=Instance.new("TextBox",f) box.Size=UDim2.new(0,70,0,24) box.Position=UDim2.new(0,84,0.5,-12) box.BackgroundColor3=Color3.fromRGB(0,15,35) box.TextColor3=Color3.new(1,1,1) box.Font=Enum.Font.Gotham box.TextScaled=true box.Text=tostring(default) box.BorderSizePixel=0 box.ClearTextOnFocus=false
+    Instance.new("UICorner",box).CornerRadius=UDim.new(0,5)
+    local setBtn=Instance.new("TextButton",f) setBtn.Size=UDim2.new(0,36,0,24) setBtn.Position=UDim2.new(0,158,0.5,-12) setBtn.BackgroundColor3=Color3.fromRGB(0,120,60) setBtn.Text="Set" setBtn.TextColor3=Color3.new(1,1,1) setBtn.Font=Enum.Font.GothamBold setBtn.TextScaled=true setBtn.BorderSizePixel=0
+    Instance.new("UICorner",setBtn).CornerRadius=UDim.new(0,5)
+    local rstBtn=Instance.new("TextButton",f) rstBtn.Size=UDim2.new(0,52,0,24) rstBtn.Position=UDim2.new(0,198,0.5,-12) rstBtn.BackgroundColor3=Color3.fromRGB(140,40,0) rstBtn.Text="Reset" rstBtn.TextColor3=Color3.new(1,1,1) rstBtn.Font=Enum.Font.GothamBold rstBtn.TextScaled=true rstBtn.BorderSizePixel=0
+    Instance.new("UICorner",rstBtn).CornerRadius=UDim.new(0,5)
+    setBtn.MouseButton1Click:Connect(function() local v=tonumber(box.Text) if v then onSet(v) end end)
+    rstBtn.MouseButton1Click:Connect(function() box.Text=tostring(default) onReset() end)
+end
+local function MakeSep(txt)
+    local f=Instance.new("Frame",Body) f.Size=UDim2.new(1,-4,0,20) f.BackgroundColor3=Color3.fromRGB(0,40,80) f.BorderSizePixel=0
+    Instance.new("UICorner",f).CornerRadius=UDim.new(0,5)
+    local l=Instance.new("TextLabel",f) l.Size=UDim2.new(1,0,1,0) l.BackgroundTransparency=1 l.Text="── "..txt.." ──" l.TextColor3=Color3.fromRGB(0,150,255) l.Font=Enum.Font.GothamBold l.TextScaled=true
+end
+-- FLY
+MakeSep("Di Chuyển")
+MakeButton("🛫 Bay Fly V3 Mobile",function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/LuckyEvil/FlyV3/master/FlyV3.lua"))()
+end)
+-- INF JUMP
+MakeToggle("🐇 Nhảy Vô Hạn",function(v) S.InfJump=v end)
+UIS.JumpRequest:Connect(function() if S.InfJump then local h=GetH() if h then h:ChangeState(Enum.HumanoidStateType.Jumping) end end end)
+-- SPEED
+MakeInput("Speed",16,function(v) local h=GetH() if h then h.WalkSpeed=v end end,function() local h=GetH() if h then h.WalkSpeed=16 end end)
+-- JUMP POWER
+MakeInput("Jump",50,function(v) local h=GetH() if h then h.JumpPower=v end end,function() local h=GetH() if h then h.JumpPower=50 end end)
+-- ESP
+MakeSep("Hiển Thị")
+local ESPFolder=nil
+MakeToggle("👁️ ESP Tên",function(v)
+    if v then
+        ESPFolder=Instance.new("Folder") ESPFolder.Name="ESP_TH" ESPFolder.Parent=workspace
+        local function MakeESP(p)
+            if p==Player then return end
+            local function Build()
+                local c=p.Character if not c then return end
+                local r=c:FindFirstChild("HumanoidRootPart") if not r then return end
+                local bb=Instance.new("BillboardGui") bb.Adornee=r bb.AlwaysOnTop=true bb.Size=UDim2.new(0,100,0,30) bb.StudsOffset=Vector3.new(0,3,0) bb.Parent=ESPFolder
+                local nl=Instance.new("TextLabel",bb) nl.Size=UDim2.new(1,0,1,0) nl.BackgroundTransparency=1 nl.TextColor3=Color3.fromRGB(255,60,60) nl.TextStrokeTransparency=0 nl.Font=Enum.Font.GothamBold nl.TextScaled=true nl.Text=p.Name
+                Conn["ESP_"..p.Name]=RS.Heartbeat:Connect(function()
+                    local myR=GetR() if myR and r.Parent then
+                        nl.Text=p.Name.." ("..math.floor((myR.Position-r.Position).Magnitude).."m)" end end)
+            end
+            p.CharacterAdded:Connect(Build) Build()
+        end
+        for _,p in ipairs(Players:GetPlayers()) do MakeESP(p) end
+        Conn.ESPAdd=Players.PlayerAdded:Connect(MakeESP)
+    else
+        for _,p in ipairs(Players:GetPlayers()) do C("ESP_"..p.Name) end
+        C("ESPAdd") if ESPFolder then ESPFolder:Destroy() ESPFolder=nil end
+    end
+end)
+MakeButton("🔄 Reset ESP",function()
+    for _,p in ipairs(Players:GetPlayers()) do C("ESP_"..p.Name) end
+    C("ESPAdd") if ESPFolder then ESPFolder:Destroy() ESPFolder=nil end
+end)
+print("Script loaded!")
