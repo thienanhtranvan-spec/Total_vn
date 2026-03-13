@@ -19,18 +19,11 @@ if not ok then ScreenGui.Parent=lp:WaitForChild("PlayerGui") end
 local R=Color3.fromRGB(220,40,40)
 local G=Color3.fromRGB(40,200,80)
 local T={
-	Bg=Color3.fromRGB(15,15,17),
-	Side=Color3.fromRGB(20,20,23),
-	Main=Color3.fromRGB(25,25,28),
-	Row=Color3.fromRGB(30,30,35),
-	Text=Color3.fromRGB(230,230,235),
-	Sub=Color3.fromRGB(140,140,150),
-	Red=R,
-	Green=G,
-	ON=G,
-	OFF=Color3.fromRGB(60,60,70),
-	Sep=Color3.fromRGB(45,45,55),
-	Input=Color3.fromRGB(35,35,42),
+	Bg=Color3.fromRGB(15,15,17),Side=Color3.fromRGB(20,20,23),
+	Main=Color3.fromRGB(25,25,28),Row=Color3.fromRGB(30,30,35),
+	Text=Color3.fromRGB(230,230,235),Sub=Color3.fromRGB(140,140,150),
+	Red=R,Green=G,ON=G,OFF=Color3.fromRGB(60,60,70),
+	Sep=Color3.fromRGB(45,45,55),Input=Color3.fromRGB(35,35,42),
 }
 local function mk(cls,props)
 	local o=Instance.new(cls)
@@ -44,10 +37,22 @@ local function pd(p,a,b,l,r)
 	x.Parent=p return x
 end
 local function notify(msg)
-	local f=mk("Frame",{Size=UDim2.new(0,260,0,44),Position=UDim2.new(0.5,-130,0,10),BackgroundColor3=T.Row,ZIndex=20,Parent=ScreenGui})
-	cr(f,8) st(f,T.Green,1.5)
-	mk("TextLabel",{Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Text=msg,TextColor3=T.Text,TextSize=13,Font=Enum.Font.GothamBold,ZIndex=21,Parent=f})
+	local f=mk("Frame",{Size=UDim2.new(0,280,0,44),Position=UDim2.new(0.5,-140,0,10),BackgroundColor3=T.Row,ZIndex=20,Parent=ScreenGui})
+	cr(f,8) st(f,G,1.5)
+	mk("TextLabel",{Size=UDim2.new(1,-16,1,0),Position=UDim2.new(0,8,0,0),BackgroundTransparency=1,Text=msg,TextColor3=T.Text,TextSize=13,Font=Enum.Font.GothamBold,ZIndex=21,Parent=f})
 	game:GetService("Debris"):AddItem(f,3)
+end
+local function mkBtn(parent,zindex)
+	local btn=mk("TextButton",{Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Text="",ZIndex=zindex or 11,Parent=parent})
+	return btn
+end
+local function connectBtn(btn,cb)
+	local debounce=false
+	btn.InputEnded:Connect(function(i)
+		if i.UserInputType==Enum.UserInputType.Touch or i.UserInputType==Enum.UserInputType.MouseButton1 then
+			if not debounce then debounce=true pcall(cb) task.delay(0.1,function()debounce=false end) end
+		end
+	end)
 end
 local OpenBtn=mk("TextButton",{Size=UDim2.new(0,48,0,48),Position=UDim2.new(0,16,0.5,-24),BackgroundColor3=T.Red,Text="☰",TextColor3=Color3.fromRGB(255,255,255),TextSize=22,Font=Enum.Font.GothamBold,ZIndex=10,Parent=ScreenGui})
 cr(OpenBtn,10) st(OpenBtn,G,2)
@@ -70,13 +75,13 @@ end)
 local MF=mk("Frame",{Size=UDim2.new(0,500,0,420),Position=UDim2.new(0.5,-250,0.5,-210),BackgroundColor3=T.Bg,Visible=false,ZIndex=5,Parent=ScreenGui})
 cr(MF,10) st(MF,G,2)
 local Hdr=mk("Frame",{Size=UDim2.new(1,0,0,40),BackgroundColor3=T.Side,ZIndex=6,Parent=MF}) cr(Hdr,10)
-mk("TextLabel",{Size=UDim2.new(1,-80,1,0),Position=UDim2.new(0,12,0,0),BackgroundTransparency=1,Text="⚡ Custom Hub  by you",TextColor3=T.Red,TextSize=14,Font=Enum.Font.GothamBold,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=7,Parent=Hdr})
+mk("TextLabel",{Size=UDim2.new(1,-80,1,0),Position=UDim2.new(0,12,0,0),BackgroundTransparency=1,Text="⚡ Custom Hub",TextColor3=T.Red,TextSize=14,Font=Enum.Font.GothamBold,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=7,Parent=Hdr})
 local MinBtn=mk("TextButton",{Size=UDim2.new(0,28,0,28),Position=UDim2.new(1,-64,0.5,-14),BackgroundColor3=T.Row,Text="−",TextColor3=T.Text,TextSize=16,Font=Enum.Font.GothamBold,ZIndex=7,Parent=Hdr}) cr(MinBtn,6)
 local XBtn=mk("TextButton",{Size=UDim2.new(0,28,0,28),Position=UDim2.new(1,-32,0.5,-14),BackgroundColor3=T.Red,Text="✕",TextColor3=Color3.fromRGB(255,255,255),TextSize=13,Font=Enum.Font.GothamBold,ZIndex=7,Parent=Hdr}) cr(XBtn,6)
 local SideBar=mk("Frame",{Size=UDim2.new(0,150,1,-40),Position=UDim2.new(0,0,0,40),BackgroundColor3=T.Side,ZIndex=6,Parent=MF})
 mk("UIListLayout",{SortOrder=Enum.SortOrder.LayoutOrder,Padding=UDim.new(0,2),Parent=SideBar})
 pd(SideBar,6,6,4,4)
-local ContentFrame=mk("Frame",{Size=UDim2.new(1,-150,1,-40),Position=UDim2.new(0,150,0,40),BackgroundColor3=T.Main,ZIndex=6,Parent=MF}) cr(ContentFrame,0)
+local ContentFrame=mk("Frame",{Size=UDim2.new(1,-150,1,-40),Position=UDim2.new(0,150,0,40),BackgroundColor3=T.Main,ZIndex=6,Parent=MF})
 local SF=mk("ScrollingFrame",{Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,ScrollBarThickness=3,ScrollBarImageColor3=T.Red,CanvasSize=UDim2.new(0,0,0,0),AutomaticCanvasSize=Enum.AutomaticSize.Y,ZIndex=7,Parent=ContentFrame})
 pd(SF,10,10,10,10)
 mk("UIListLayout",{SortOrder=Enum.SortOrder.LayoutOrder,Padding=UDim.new(0,6),Parent=SF})
@@ -84,56 +89,52 @@ local TabButtons={}
 local ActiveTab=""
 local Pages={}
 local Widgets={}
+local ToggleStates={}
 local function clearWidgets()for _,v in pairs(Widgets)do v:Destroy()end Widgets={} end
-                             local function addSep(title)
+local function addSep(title)
 	local f=mk("Frame",{Size=UDim2.new(1,0,0,26),BackgroundTransparency=1,ZIndex=8,Parent=SF})
-	local lb=mk("TextLabel",{Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Text=title,TextColor3=T.Red,TextSize=12,Font=Enum.Font.GothamBold,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=9,Parent=f})
-	local line=mk("Frame",{Size=UDim2.new(1,0,0,1),Position=UDim2.new(0,0,1,-1),BackgroundColor3=T.Red,BorderSizePixel=0,ZIndex=9,Parent=f})
-	table.insert(Widgets,f) return f
+	mk("TextLabel",{Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Text=title,TextColor3=T.Red,TextSize=12,Font=Enum.Font.GothamBold,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=9,Parent=f})
+	mk("Frame",{Size=UDim2.new(1,0,0,1),Position=UDim2.new(0,0,1,-1),BackgroundColor3=T.Red,BorderSizePixel=0,ZIndex=9,Parent=f})
+	table.insert(Widgets,f)
 end
-local function addToggle(label,desc,cb)
-	local row=mk("Frame",{Size=UDim2.new(1,0,0,52),BackgroundColor3=T.Row,ZIndex=8,Parent=SF}) cr(row,7)
-	st(row,T.Sep,1)
-	local state=false
+local function addToggle(id,label,desc,cb)
+	if ToggleStates[id]==nil then ToggleStates[id]=false end
+	local row=mk("Frame",{Size=UDim2.new(1,0,0,52),BackgroundColor3=T.Row,ZIndex=8,Parent=SF}) cr(row,7) st(row,T.Sep,1)
 	mk("TextLabel",{Size=UDim2.new(1,-70,0,24),Position=UDim2.new(0,10,0,6),BackgroundTransparency=1,Text=label,TextColor3=T.Text,TextSize=13,Font=Enum.Font.GothamBold,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=9,Parent=row})
 	mk("TextLabel",{Size=UDim2.new(1,-70,0,18),Position=UDim2.new(0,10,0,28),BackgroundTransparency=1,Text=desc or "",TextColor3=T.Sub,TextSize=11,Font=Enum.Font.Gotham,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=9,Parent=row})
-	local pill=mk("Frame",{Size=UDim2.new(0,46,0,24),Position=UDim2.new(1,-56,0.5,-12),BackgroundColor3=T.OFF,ZIndex=9,Parent=row}) cr(pill,12)
+	local pill=mk("Frame",{Size=UDim2.new(0,46,0,24),Position=UDim2.new(1,-56,0.5,-12),ZIndex=9,Parent=row}) cr(pill,12)
 	local knob=mk("Frame",{Size=UDim2.new(0,18,0,18),Position=UDim2.new(0,3,0.5,-9),BackgroundColor3=Color3.fromRGB(255,255,255),ZIndex=10,Parent=pill}) cr(knob,9)
-	local btn=mk("TextButton",{Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Text="",ZIndex=11,Parent=row})
 	local function upd()
-		pill.BackgroundColor3=state and T.ON or T.OFF
-		knob.Position=state and UDim2.new(1,-21,0.5,-9) or UDim2.new(0,3,0.5,-9)
+		local s=ToggleStates[id]
+		pill.BackgroundColor3=s and T.ON or T.OFF
+		knob.Position=s and UDim2.new(1,-21,0.5,-9) or UDim2.new(0,3,0.5,-9)
 	end
-	local function fired() state=not state upd() if cb then pcall(cb,state) end end
-	btn.MouseButton1Click:Connect(fired) btn.TouchTap:Connect(fired)
-	table.insert(Widgets,row) return {setState=function(s) state=s upd() end}
+	upd()
+	local btn=mkBtn(row,11)
+	connectBtn(btn,function()
+		ToggleStates[id]=not ToggleStates[id]
+		upd()
+		if cb then pcall(cb,ToggleStates[id]) end
+	end)
+	table.insert(Widgets,row)
 end
 local function addButton(label,desc,cb)
-	local row=mk("Frame",{Size=UDim2.new(1,0,0,44),BackgroundColor3=T.Row,ZIndex=8,Parent=SF}) cr(row,7)
-	st(row,T.Red,1)
-	mk("TextLabel",{Size=UDim2.new(1,-16,0,22),Position=UDim2.new(0,10,0,4),BackgroundTransparency=1,Text=label,TextColor3=T.Text,TextSize=13,Font=Enum.Font.GothamBold,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=9,Parent=row})
+	local row=mk("Frame",{Size=UDim2.new(1,0,0,desc and 44 or 36),BackgroundColor3=T.Row,ZIndex=8,Parent=SF}) cr(row,7) st(row,T.Red,1)
+	mk("TextLabel",{Size=UDim2.new(1,-16,0,22),Position=UDim2.new(0,10,0,desc and 4 or 7),BackgroundTransparency=1,Text=label,TextColor3=T.Text,TextSize=13,Font=Enum.Font.GothamBold,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=9,Parent=row})
 	if desc then mk("TextLabel",{Size=UDim2.new(1,-16,0,16),Position=UDim2.new(0,10,0,24),BackgroundTransparency=1,Text=desc,TextColor3=T.Sub,TextSize=11,Font=Enum.Font.Gotham,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=9,Parent=row}) end
-	local btn=mk("TextButton",{Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Text="",ZIndex=11,Parent=row})
-	local function fired() if cb then pcall(cb) end end
-	btn.MouseButton1Click:Connect(fired) btn.TouchTap:Connect(fired)
+	local btn=mkBtn(row,11)
+	connectBtn(btn,function() if cb then pcall(cb) end end)
 	table.insert(Widgets,row)
 end
 local function addInput(label,placeholder,btnText,cb,resetCb)
-	local row=mk("Frame",{Size=UDim2.new(1,0,0,80),BackgroundColor3=T.Row,ZIndex=8,Parent=SF}) cr(row,7)
-	st(row,T.Sep,1)
+	local row=mk("Frame",{Size=UDim2.new(1,0,0,80),BackgroundColor3=T.Row,ZIndex=8,Parent=SF}) cr(row,7) st(row,T.Sep,1)
 	mk("TextLabel",{Size=UDim2.new(1,0,0,22),Position=UDim2.new(0,10,0,4),BackgroundTransparency=1,Text=label,TextColor3=T.Text,TextSize=13,Font=Enum.Font.GothamBold,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=9,Parent=row})
-	local box=mk("TextBox",{Size=UDim2.new(1,-100,0,26),Position=UDim2.new(0,10,0,28),BackgroundColor3=T.Input,PlaceholderText=placeholder or "",Text="",TextColor3=T.Text,PlaceholderColor3=T.Sub,TextSize=12,Font=Enum.Font.Gotham,ClearTextOnFocus=false,ZIndex=9,Parent=row}) cr(box,6) pd(box,2,2,6,6)
-	local setBtn=mk("TextButton",{Size=UDim2.new(0,38,0,26),Position=UDim2.new(1,-90,0,28),BackgroundColor3=T.Red,Text=btnText or "Set",TextColor3=Color3.fromRGB(255,255,255),TextSize=11,Font=Enum.Font.GothamBold,ZIndex=9,Parent=row}) cr(setBtn,6)
-	local rstBtn=mk("TextButton",{Size=UDim2.new(0,38,0,26),Position=UDim2.new(1,-48,0,28),BackgroundColor3=T.Row,Text="Reset",TextColor3=T.Sub,TextSize=10,Font=Enum.Font.GothamBold,ZIndex=9,Parent=row}) cr(rstBtn,6) st(rstBtn,T.Sep,1)
-	local function doSet() if cb then pcall(cb,box.Text) end end
-	local function doReset() if resetCb then pcall(resetCb) end box.Text="" end
-	setBtn.MouseButton1Click:Connect(doSet) setBtn.TouchTap:Connect(doSet)
-	rstBtn.MouseButton1Click:Connect(doReset) rstBtn.TouchTap:Connect(doReset)
+	local box=mk("TextBox",{Size=UDim2.new(1,-100,0,26),Position=UDim2.new(0,10,0,30),BackgroundColor3=T.Input,PlaceholderText=placeholder or "",Text="",TextColor3=T.Text,PlaceholderColor3=T.Sub,TextSize=12,Font=Enum.Font.Gotham,ClearTextOnFocus=false,ZIndex=9,Parent=row}) cr(box,6) pd(box,2,2,6,6)
+	local setBtn=mk("TextButton",{Size=UDim2.new(0,38,0,26),Position=UDim2.new(1,-90,0,30),BackgroundColor3=T.Red,Text=btnText or "Set",TextColor3=Color3.fromRGB(255,255,255),TextSize=11,Font=Enum.Font.GothamBold,ZIndex=9,Parent=row}) cr(setBtn,6)
+	local rstBtn=mk("TextButton",{Size=UDim2.new(0,38,0,26),Position=UDim2.new(1,-48,0,30),BackgroundColor3=T.Row,Text="Reset",TextColor3=T.Sub,TextSize=10,Font=Enum.Font.GothamBold,ZIndex=9,Parent=row}) cr(rstBtn,6) st(rstBtn,T.Sep,1)
+	connectBtn(setBtn,function() if cb then pcall(cb,box.Text) end end)
+	connectBtn(rstBtn,function() if resetCb then pcall(resetCb) end box.Text="" end)
 	table.insert(Widgets,row)
-end
-local function addLabel(text)
-	local lb=mk("TextLabel",{Size=UDim2.new(1,0,0,22),BackgroundTransparency=1,Text=text,TextColor3=T.Sub,TextSize=11,Font=Enum.Font.Gotham,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=8,Parent=SF})
-	table.insert(Widgets,lb)
 end
 local savedPositions={}
 local function addTPSavePanel()
@@ -148,18 +149,16 @@ local function addTPSavePanel()
 		for _,v in pairs(listFrame:GetChildren())do if not v:IsA("UIListLayout")then v:Destroy()end end
 		for i,pos in ipairs(savedPositions)do
 			local r=mk("Frame",{Size=UDim2.new(1,0,0,34),BackgroundColor3=T.Row,LayoutOrder=i,ZIndex=9,Parent=listFrame}) cr(r,6) st(r,T.Sep,1)
-			mk("TextLabel",{Size=UDim2.new(1,-80,1,0),Position=UDim2.new(0,10,0,0),BackgroundTransparency=1,Text="📍 #"..i.." ("..math.floor(pos.X)..","..math.floor(pos.Y)..","..math.floor(pos.Z)..")",TextColor3=T.Text,TextSize=11,Font=Enum.Font.Gotham,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=10,Parent=r})
+			mk("TextLabel",{Size=UDim2.new(1,-70,1,0),Position=UDim2.new(0,10,0,0),BackgroundTransparency=1,Text="📍 #"..i.." ("..math.floor(pos.X)..","..math.floor(pos.Y)..","..math.floor(pos.Z)..")",TextColor3=T.Text,TextSize=11,Font=Enum.Font.Gotham,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=10,Parent=r})
 			local tpb=mk("TextButton",{Size=UDim2.new(0,50,0,24),Position=UDim2.new(1,-58,0.5,-12),BackgroundColor3=T.Red,Text="TP",TextColor3=Color3.fromRGB(255,255,255),TextSize=11,Font=Enum.Font.GothamBold,ZIndex=10,Parent=r}) cr(tpb,6)
 			local pp=pos
-			local function doTP() if root then root.CFrame=CFrame.new(pp) end end
-			tpb.MouseButton1Click:Connect(doTP) tpb.TouchTap:Connect(doTP)
+			connectBtn(tpb,function() if root then root.CFrame=CFrame.new(pp) end end)
 		end
 	end
-	local function doSave()
+	connectBtn(saveBtn,function()
 		if #savedPositions>=20 then notify("⚠ Đã đầy 20 vị trí!") return end
-		if root then table.insert(savedPositions,root.Position) refreshList() notify("✅ Đã lưu vị trí #"..#savedPositions) end
-	end
-	saveBtn.MouseButton1Click:Connect(doSave) saveBtn.TouchTap:Connect(doSave)
+		if root then table.insert(savedPositions,root.Position) refreshList() notify("✅ Lưu vị trí #"..#savedPositions) end
+	end)
 end
 local function renderTab(name)
 	clearWidgets()
@@ -168,12 +167,12 @@ local function renderTab(name)
 end
 local function addTab(name,icon,fn)
 	Pages[name]=fn
-	local btn=mk("TextButton",{Size=UDim2.new(1,0,0,38),BackgroundColor3=Color3.fromRGB(0,0,0,0),BackgroundTransparency=1,Text="",ZIndex=7,Parent=SideBar})
+	local btn=mk("TextButton",{Size=UDim2.new(1,0,0,38),BackgroundTransparency=1,Text="",ZIndex=7,Parent=SideBar})
 	local accent=mk("Frame",{Size=UDim2.new(0,3,0.7,0),Position=UDim2.new(0,0,0.15,0),BackgroundColor3=T.Red,Visible=false,ZIndex=8,Parent=btn}) cr(accent,2)
 	mk("TextLabel",{Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Text=icon.." "..name,TextColor3=T.Sub,TextSize=12,Font=Enum.Font.GothamBold,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=8,Parent=btn})
 	pd(btn,0,0,10,0)
 	TabButtons[name]={btn=btn,accent=accent}
-	local function fired()
+	connectBtn(btn,function()
 		for n,tb in pairs(TabButtons)do
 			tb.accent.Visible=false
 			tb.btn:FindFirstChildOfClass("TextLabel").TextColor3=T.Sub
@@ -182,8 +181,7 @@ local function addTab(name,icon,fn)
 		btn:FindFirstChildOfClass("TextLabel").TextColor3=T.Text
 		ActiveTab=name
 		renderTab(name)
-	end
-	btn.MouseButton1Click:Connect(fired) btn.TouchTap:Connect(fired)
+	end)
 end
 local menuOpen=false
 local minimized=false
@@ -192,27 +190,16 @@ local function toggleMenu()
 	MF.Visible=menuOpen
 	if menuOpen and ActiveTab~="" then renderTab(ActiveTab) end
 end
-XBtn.MouseButton1Click:Connect(toggleMenu) XBtn.TouchTap:Connect(toggleMenu)
-OpenBtn.MouseButton1Click:Connect(toggleMenu) OpenBtn.TouchTap:Connect(toggleMenu)
-MinBtn.MouseButton1Click:Connect(function()
+connectBtn(XBtn,toggleMenu) connectBtn(OpenBtn,toggleMenu)
+connectBtn(MinBtn,function()
 	minimized=not minimized
 	SideBar.Visible=not minimized
 	ContentFrame.Visible=not minimized
 	MF.Size=minimized and UDim2.new(0,500,0,40) or UDim2.new(0,500,0,420)
 end)
-MinBtn.TouchTap:Connect(function()
-	minimized=not minimized
-	SideBar.Visible=not minimized
-	ContentFrame.Visible=not minimized
-	MF.Size=minimized and UDim2.new(0,500,0,40) or UDim2.new(0,500,0,420)
-end)
-                                                                                 local conn={}
+local conn={}
 local function addConn(tag,c) if conn[tag] then conn[tag]:Disconnect() end conn[tag]=c end
 local checkpoint=nil
-local aimActive=false
-local aimConn=nil
-local shiftlockActive=false
-local slConn=nil
 local slBtn=mk("TextButton",{Size=UDim2.new(0,40,0,40),Position=UDim2.new(1,-50,0,50),BackgroundColor3=T.Red,Text="X",TextColor3=Color3.fromRGB(255,255,255),TextSize=18,Font=Enum.Font.GothamBold,Visible=false,ZIndex=10,Parent=ScreenGui}) cr(slBtn,8) st(slBtn,G,2)
 local slDrag,slDInput,slDStart,slDPos=false
 slBtn.InputBegan:Connect(function(i)
@@ -240,31 +227,28 @@ addTab("Player","👤",function()
 		local n=tonumber(v) if n and hum then hum.JumpPower=n notify("✅ Jump: "..n) end
 	end,function() if hum then hum.JumpPower=50 notify("🔄 Reset jump") end end)
 	addSep("Chức Năng")
-	addToggle("Inf Jump","Nhảy vô hạn",function(s)
+	addToggle("infjump","Inf Jump","Nhảy vô hạn",function(s)
 		if s then addConn("ij",UIS.JumpRequest:Connect(function()if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping)end end))
 		else if conn.ij then conn.ij:Disconnect()end end
 	end)
-	addToggle("Low Gravity","Trọng lực thấp",function(s) workspace.Gravity=s and 30 or 196.2 end)
+	addToggle("lowgrav","Low Gravity","Trọng lực thấp",function(s) workspace.Gravity=s and 30 or 196.2 end)
 	addButton("Reset Character","Hồi sinh nhân vật",function() if hum then hum.Health=0 end end)
-	addToggle("Lưu Checkpoint","Chết sẽ tp về checkpoint",function(s)
+	addToggle("ckpt","Lưu Checkpoint","Chết sẽ tp về checkpoint",function(s)
 		if s then
 			checkpoint=root and root.Position
 			notify("📍 Checkpoint đã lưu!")
 			addConn("ckpt",lp.CharacterAdded:Connect(function()
-				getChar()
-				task.wait(2)
+				getChar() task.wait(2)
 				if checkpoint and root then root.CFrame=CFrame.new(checkpoint) end
 			end))
 		else if conn.ckpt then conn.ckpt:Disconnect()end checkpoint=nil end
 	end)
-	addToggle("Shiftlock","Khóa camera sau lưng",function(s)
-		shiftlockActive=s
+	addToggle("sl","Shiftlock","Khóa camera sau lưng",function(s)
 		slBtn.Visible=s
 		if s then
 			addConn("sl",RunService.RenderStepped:Connect(function()
 				if char and root then
-					local cam=workspace.CurrentCamera
-					local cf=cam.CFrame
+					local cf=workspace.CurrentCamera.CFrame
 					root.CFrame=CFrame.new(root.Position,root.Position+Vector3.new(cf.LookVector.X,0,cf.LookVector.Z))
 				end
 			end))
@@ -273,8 +257,7 @@ addTab("Player","👤",function()
 end)
 addTab("Combat","⚔️",function()
 	addSep("Aim Assist")
-	addToggle("Aim Đầu","Auto aim người gần nhất trong vòng tròn",function(s)
-		aimActive=s
+	addToggle("aim","Aim Đầu","Auto aim người gần nhất trong vòng tròn",function(s)
 		if s then
 			addConn("aim",RunService.RenderStepped:Connect(function()
 				local best,bd=nil,200
@@ -304,26 +287,23 @@ addTab("Combat","⚔️",function()
 	addButton("Đưa Tool Jerk Off","Giống IY tool",function()
 		local t=Instance.new("Tool") t.Name="JerkOff" t.RequiresHandle=false
 		local s=Instance.new("LocalScript",t)
-		s.Source=[[
-			local tool=script.Parent
-			tool.Activated:Connect(function()
-				local char=tool.Parent
-				local root=char:FindFirstChild("HumanoidRootPart")
-				if root then
-					local bv=Instance.new("BodyVelocity",root)
-					bv.Velocity=root.CFrame.LookVector*500+Vector3.new(0,200,0)
-					bv.MaxForce=Vector3.new(9e9,9e9,9e9)
-					game:GetService("Debris"):AddItem(bv,0.2)
-				end
-			end)
-		]]
+		s.Source=[[local tool=script.Parent
+tool.Activated:Connect(function()
+	local root=tool.Parent:FindFirstChild("HumanoidRootPart")
+	if root then
+		local bv=Instance.new("BodyVelocity",root)
+		bv.Velocity=root.CFrame.LookVector*500+Vector3.new(0,200,0)
+		bv.MaxForce=Vector3.new(9e9,9e9,9e9)
+		game:GetService("Debris"):AddItem(bv,0.2)
+	end
+end)]]
 		t.Parent=lp.Backpack
-		notify("✅ Tool đã vào Backpack!")
+		notify("✅ Tool vào Backpack!")
 	end)
 end)
 addTab("Move","🏃",function()
 	addSep("Di Chuyển")
-	addToggle("Fly","Bay tự do (WASD+Space)",function(s)
+	addToggle("fly","Fly","Bay tự do (WASD+Space)",function(s)
 		if s then
 			local bg=Instance.new("BodyGyro",root) bg.MaxTorque=Vector3.new(9e9,9e9,9e9) bg.D=100 bg.Name="FlyG"
 			local bv=Instance.new("BodyVelocity",root) bv.MaxForce=Vector3.new(9e9,9e9,9e9) bv.Name="FlyV"
@@ -345,7 +325,7 @@ addTab("Move","🏃",function()
 			if root:FindFirstChild("FlyV") then root.FlyV:Destroy()end
 		end
 	end)
-	addToggle("No Clip","Xuyên tường",function(s)
+	addToggle("nc","No Clip","Xuyên tường",function(s)
 		if s then addConn("nc",RunService.Stepped:Connect(function()
 			if char then for _,p in pairs(char:GetDescendants())do if p:IsA("BasePart")then p.CanCollide=false end end end
 		end))
@@ -355,30 +335,25 @@ addTab("Move","🏃",function()
 	addButton("TP Tool","Bật teleport tool click",function()
 		local t=Instance.new("Tool") t.Name="TPTool" t.RequiresHandle=false
 		local s=Instance.new("LocalScript",t)
-		s.Source=[[
-			local tool=script.Parent
-			local Players=game:GetService("Players")
-			local lp=Players.LocalPlayer
-			tool.Activated:Connect(function()
-				local mouse=lp:GetMouse()
-				local target=mouse.Hit
-				local root=lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-				if root and target then root.CFrame=target*CFrame.new(0,3,0) end
-			end)
-		]]
+		s.Source=[[local tool=script.Parent
+local lp=game:GetService("Players").LocalPlayer
+tool.Activated:Connect(function()
+	local root=lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+	local target=lp:GetMouse().Hit
+	if root and target then root.CFrame=target*CFrame.new(0,3,0) end
+end)]]
 		t.Parent=lp.Backpack
 		notify("✅ TP Tool vào Backpack!")
 	end)
 	addInput("TP tới người chơi","Nhập tên (1 chữ cũng được)","TP",function(v)
 		local found={}
 		for _,p in pairs(Players:GetPlayers())do
-			if p~=lp and p.Name:lower():sub(1,#v)==v:lower() then table.insert(found,p) end
+			if p~=lp and p.Name:lower():find(v:lower(),1,true) then table.insert(found,p) end
 		end
 		if #found==0 then notify("❌ Không tìm thấy: "..v)
 		elseif #found>1 then
-			local names=""
-			for _,p in pairs(found)do names=names..p.Name.." " end
-			notify("⚠ Trùng tên: "..names.."→ ghi thêm chữ!")
+			local names="" for _,p in pairs(found)do names=names..p.Name.." " end
+			notify("⚠ Trùng: "..names.."→ ghi thêm!")
 		else
 			local p=found[1]
 			if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
@@ -399,11 +374,11 @@ addTab("Move","🏃",function()
 end)
 addTab("World","🌍",function()
 	addSep("Visual")
-	addToggle("Full Bright","Sáng toàn bộ map",function(s)
+	addToggle("fbright","Full Bright","Sáng toàn bộ map",function(s)
 		local L=game:GetService("Lighting")
 		L.Brightness=s and 10 or 1 L.FogEnd=s and 1e9 or 1e4
 	end)
-	addToggle("ESP","Hiện tên + máu người chơi",function(s)
+	addToggle("esp","ESP","Hiện tên + máu người chơi",function(s)
 		if s then
 			addConn("esp",RunService.Heartbeat:Connect(function()
 				for _,p in pairs(Players:GetPlayers())do
@@ -412,7 +387,7 @@ addTab("World","🌍",function()
 						if not head:FindFirstChild("ESPBill") then
 							local bb=Instance.new("BillboardGui",head) bb.Name="ESPBill"
 							bb.Size=UDim2.new(0,100,0,40) bb.StudsOffset=Vector3.new(0,2,0) bb.AlwaysOnTop=true
-							local nl=mk("TextLabel",{Size=UDim2.new(1,0,0.5,0),BackgroundTransparency=1,Text=p.Name,TextColor3=T.Red,TextSize=12,Font=Enum.Font.GothamBold,Parent=bb})
+							mk("TextLabel",{Size=UDim2.new(1,0,0.5,0),BackgroundTransparency=1,Text=p.Name,TextColor3=T.Red,TextSize=12,Font=Enum.Font.GothamBold,Parent=bb})
 							local hl=mk("TextLabel",{Size=UDim2.new(1,0,0.5,0),Position=UDim2.new(0,0,0.5,0),BackgroundTransparency=1,Text="❤ 100",TextColor3=G,TextSize=11,Font=Enum.Font.Gotham,Parent=bb})
 							addConn("esp_"..p.Name,RunService.Heartbeat:Connect(function()
 								local h=p.Character and p.Character:FindFirstChild("Humanoid")
@@ -434,64 +409,39 @@ addTab("World","🌍",function()
 	end)
 	addSep("Server")
 	addButton("Hop Server","Chuyển server ngẫu nhiên",function()
-		local servers={}
-		local ok,result=pcall(function()
+		local ok2,result=pcall(function()
 			return game:GetService("HttpService"):JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"))
 		end)
-		if ok and result and result.data then
-			for _,s in pairs(result.data)do
-				if s.id~=game.JobId and s.playing<s.maxPlayers then table.insert(servers,s.id)end
-			end
+		if ok2 and result and result.data then
+			local servers={}
+			for _,s in pairs(result.data)do if s.id~=game.JobId and s.playing<s.maxPlayers then table.insert(servers,s.id)end end
 			if #servers>0 then TeleportService:TeleportToPlaceInstance(game.PlaceId,servers[math.random(1,#servers)],lp)
 			else notify("❌ Không tìm được server!")end
 		else notify("⚠ Lỗi lấy server list")end
 	end)
 	addButton("Rejoin","Vào lại game",function() TeleportService:Teleport(game.PlaceId,lp) end)
-	addButton("Copy Server ID","Copy JobId hiện tại",function()
-		setclipboard(game.JobId)
-		notify("✅ Copied: "..game.JobId)
-	end)
+	addButton("Copy Server ID","Copy JobId hiện tại",function() setclipboard(game.JobId) notify("✅ Copied: "..game.JobId) end)
 	addInput("TP tới Server ID","Dán Server ID vào đây","TP",function(v)
-		if v and v~="" then
-			pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId,v,lp) end)
-		end
+		if v and v~="" then pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId,v,lp) end) end
 	end,nil)
-	addButton("Copy Remove Event","Copy script xóa event",function()
+	addButton("Copy Remove Event","Copy script xóa remote",function()
 		setclipboard([[for _,v in pairs(game:GetDescendants())do if v:IsA("RemoteEvent") or v:IsA("RemoteFunction") then v:Destroy()end end]])
-		notify("✅ Copied remove event script!")
+		notify("✅ Copied!")
 	end)
 end)
 addTab("Loader","📦",function()
 	addSep("Load Scripts")
-	addButton("Load IY Menu","Infinite Yield",function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
-	end)
-	addButton("Load Dex Explorer","Explorer tool",function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/LorekeeperZinnia/Dex/master/Dex3.1.lua"))()
-	end)
-	addButton("Load F3X Build Tool","Client side build",function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/scripthub00/script-hub/main/scripts/f3x.lua"))()
-	end)
-	addButton("Load Fly V3","Script fly chuyên dụng",function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/XEBV/Fly/main/fly.lua"))()
-	end)
+	addButton("Load IY Menu","Infinite Yield",function() loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))() end)
+	addButton("Load Dex Explorer","Explorer tool",function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LorekeeperZinnia/Dex/master/Dex3.1.lua"))() end)
+	addButton("Load F3X Build Tool","Client side build",function() loadstring(game:HttpGet("https://raw.githubusercontent.com/scripthub00/script-hub/main/scripts/f3x.lua"))() end)
+	addButton("Load Fly V3","Script fly chuyên dụng",function() loadstring(game:HttpGet("https://raw.githubusercontent.com/XEBV/Fly/main/fly.lua"))() end)
 end)
-addTab("TP Save","💾",function()
-	addTPSavePanel()
-end)
-local firstTab=TabButtons[next(TabButtons)]
-if firstTab then firstTab.btn.MouseButton1Click:Fire() end
+addTab("TP Save","💾",function() addTPSavePanel() end)
 local function clickFirst()
-	local name=nil
-	for n,_ in pairs(Pages)do name=n break end
+	local name=nil for n,_ in pairs(Pages)do name=n break end
 	if name then
 		local tb=TabButtons[name]
-		if tb then
-			tb.accent.Visible=true
-			tb.btn:FindFirstChildOfClass("TextLabel").TextColor3=T.Text
-			ActiveTab=name
-			renderTab(name)
-		end
+		if tb then tb.accent.Visible=true tb.btn:FindFirstChildOfClass("TextLabel").TextColor3=T.Text ActiveTab=name renderTab(name) end
 	end
 end
 clickFirst()
