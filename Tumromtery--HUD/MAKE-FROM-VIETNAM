@@ -1,0 +1,265 @@
+local ScreenGui = Instance.new("ScreenGui")
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local lp = Players.LocalPlayer
+local char, root, hum
+local function getChar()
+	char = lp.Character or lp.CharacterAdded:Wait()
+	root = char:WaitForChild("HumanoidRootPart")
+	hum = char:WaitForChild("Humanoid")
+end
+getChar()
+lp.CharacterAdded:Connect(getChar)
+ScreenGui.Name = "Hub"
+ScreenGui.ResetOnSpawn = false
+local ok = pcall(function() ScreenGui.Parent = game:GetService("CoreGui") end)
+if not ok then ScreenGui.Parent = lp:WaitForChild("PlayerGui") end
+local T = {
+	Bg=Color3.fromRGB(18,18,20), Panel=Color3.fromRGB(25,25,28),
+	Tab=Color3.fromRGB(20,20,23), TabOn=Color3.fromRGB(35,35,42),
+	Accent=Color3.fromRGB(100,80,255), Text=Color3.fromRGB(230,230,235),
+	Sub=Color3.fromRGB(140,140,150), ON=Color3.fromRGB(80,220,120),
+	OFF=Color3.fromRGB(200,60,60), Btn=Color3.fromRGB(38,38,45),
+	Sep=Color3.fromRGB(40,40,48), Row=Color3.fromRGB(30,30,35),
+}
+local function mk(cls,props)
+	local o=Instance.new(cls)
+	for k,v in pairs(props) do o[k]=v end
+	return o
+end
+local function cr(p,r) local c=mk("UICorner",{CornerRadius=UDim.new(0,r or 6)}) c.Parent=p return c end
+local function st(p,c,t) local s=mk("UIStroke",{Color=c or T.Sep,Thickness=t or 1}) s.Parent=p return s end
+local function pd(p,a,b,l,r)
+	local x=mk("UIPadding",{PaddingTop=UDim.new(0,a or 6),PaddingBottom=UDim.new(0,b or 6),PaddingLeft=UDim.new(0,l or 8),PaddingRight=UDim.new(0,r or 8)})
+	x.Parent=p return x
+end
+local OpenBtn = mk("TextButton",{Size=UDim2.new(0,44,0,44),Position=UDim2.new(0,20,0.5,-22),BackgroundColor3=T.Panel,Text="☰",TextColor3=T.Text,TextSize=22,Font=Enum.Font.GothamBold,ZIndex=10,Parent=ScreenGui})
+cr(OpenBtn,10) st(OpenBtn,T.Accent,1.5)
+local drag,dInput,dStart,dPos=false
+OpenBtn.InputBegan:Connect(function(i)
+	if i.UserInputType==Enum.UserInputType.Touch or i.UserInputType==Enum.UserInputType.MouseButton1 then
+		drag=true dStart=i.Position dPos=OpenBtn.Position
+		i.Changed:Connect(function() if i.UserInputState==Enum.UserInputState.End then drag=false end end)
+	end
+end)
+OpenBtn.InputChanged:Connect(function(i)
+	if i.UserInputType==Enum.UserInputType.Touch or i.UserInputType==Enum.UserInputType.MouseMovement then dInput=i end
+end)
+UIS.InputChanged:Connect(function(i)
+	if i==dInput and drag then
+		local d=i.Position-dStart
+		OpenBtn.Position=UDim2.new(dPos.X.Scale,dPos.X.Offset+d.X,dPos.Y.Scale,dPos.Y.Offset+d.Y)
+	end
+end)
+local MF=mk("Frame",{Size=UDim2.new(0,340,0,450),Position=UDim2.new(0.5,-170,0.5,-225),BackgroundColor3=T.Bg,Visible=false,ZIndex=5,Parent=ScreenGui})
+cr(MF,12) st(MF,Color3.fromRGB(55,50,80),1.5)
+local Hdr=mk("Frame",{Size=UDim2.new(1,0,0,42),BackgroundColor3=T.Panel,ZIndex=6,Parent=MF}) cr(Hdr,12)
+mk("TextLabel",{Size=UDim2.new(1,-50,1,0),Position=UDim2.new(0,12,0,0),BackgroundTransparency=1,Text="⚡ Custom Hub",TextColor3=T.Text,TextSize=15,Font=Enum.Font.GothamBold,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=7,Parent=Hdr})
+local XBtn=mk("TextButton",{Size=UDim2.new(0,30,0,30),Position=UDim2.new(1,-38,0.5,-15),BackgroundColor3=Color3.fromRGB(180,50,50),Text="✕",TextColor3=Color3.fromRGB(255,255,255),TextSize=13,Font=Enum.Font.GothamBold,ZIndex=7,Parent=Hdr}) cr(XBtn,6)
+local TabBar=mk("Frame",{Size=UDim2.new(1,-16,0,34),Position=UDim2.new(0,8,0,48),BackgroundColor3=T.Tab,ZIndex=6,Parent=MF}) cr(TabBar,8)
+mk("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,HorizontalAlignment=Enum.HorizontalAlignment.Center,VerticalAlignment=Enum.VerticalAlignment.Center,Padding=UDim.new(0,2),Parent=TabBar})
+local CA=mk("Frame",{Size=UDim2.new(1,-16,1,-98),Position=UDim2.new(0,8,0,90),BackgroundColor3=T.Panel,ZIndex=6,Parent=MF}) cr(CA,8)
+local SF=mk("ScrollingFrame",{Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,ScrollBarThickness=3,ScrollBarImageColor3=T.Accent,CanvasSize=UDim2.new(0,0,0,0),AutomaticCanvasSize=Enum.AutomaticSize.Y,ZIndex=7,Parent=CA})
+pd(SF,8,8,8,8)
+mk("UIListLayout",{SortOrder=Enum.SortOrder.LayoutOrder,Padding=UDim.new(0,5),Parent=SF})
+local TabNames={"Main","Combat","Move","World","Settings"}
+local TabIcons={"🏠","⚔️","🏃","🌍","⚙️"}
+local Pages,TabBtns,ActiveTab,Widgets={},{},TabNames[1],{}
+local Menu={Toggles={},States={}}
+function Menu:AddSep(tab,title) Pages[tab]=Pages[tab] or {} table.insert(Pages[tab],{t="sep",title=title}) end
+function Menu:AddLabel(tab,text) Pages[tab]=Pages[tab] or {} table.insert(Pages[tab],{t="lbl",text=text}) end
+function Menu:AddToggle(tab,label,def,cb)
+	Pages[tab]=Pages[tab] or {}
+	local item={t="tog",label=label,state=def or false,cb=cb}
+	table.insert(Pages[tab],item) Menu.Toggles[label]=item Menu.States[label]=def or false return item
+end
+function Menu:AddButton(tab,label,cb) Pages[tab]=Pages[tab] or {} table.insert(Pages[tab],{t="btn",label=label,cb=cb}) end
+local function clearWidgets() for _,v in pairs(Widgets) do v:Destroy() end Widgets={} end
+local function renderTab(name)
+	clearWidgets()
+	for i,item in ipairs(Pages[name] or {}) do
+		if item.t=="sep" then
+			local f=mk("Frame",{Size=UDim2.new(1,0,0,22),BackgroundTransparency=1,LayoutOrder=i,ZIndex=8,Parent=SF})
+			mk("Frame",{Size=UDim2.new(1,0,0,1),Position=UDim2.new(0,0,0.5,0),BackgroundColor3=T.Sep,BorderSizePixel=0,ZIndex=8,Parent=f})
+			if item.title and item.title~="" then
+				local lb=mk("TextLabel",{Size=UDim2.new(0,0,1,0),AutomaticSize=Enum.AutomaticSize.X,Position=UDim2.new(0.5,0,0,0),AnchorPoint=Vector2.new(0.5,0),BackgroundColor3=T.Panel,Text="  "..item.title.."  ",TextColor3=T.Accent,TextSize=11,Font=Enum.Font.GothamBold,ZIndex=9,Parent=f})
+				cr(lb,4)
+			end
+			table.insert(Widgets,f)
+		elseif item.t=="lbl" then
+			local lb=mk("TextLabel",{Size=UDim2.new(1,0,0,24),BackgroundTransparency=1,Text=item.text,TextColor3=T.Sub,TextSize=12,Font=Enum.Font.Gotham,TextXAlignment=Enum.TextXAlignment.Left,LayoutOrder=i,ZIndex=8,Parent=SF})
+			table.insert(Widgets,lb)
+		elseif item.t=="tog" then
+			local row=mk("Frame",{Size=UDim2.new(1,0,0,38),BackgroundColor3=T.Row,LayoutOrder=i,ZIndex=8,Parent=SF}) cr(row,7)
+			mk("TextLabel",{Size=UDim2.new(1,-70,1,0),Position=UDim2.new(0,10,0,0),BackgroundTransparency=1,Text=item.label,TextColor3=T.Text,TextSize=13,Font=Enum.Font.Gotham,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=9,Parent=row})
+			local tb=mk("TextButton",{Size=UDim2.new(0,56,0,26),Position=UDim2.new(1,-64,0.5,-13),Font=Enum.Font.GothamBold,TextSize=12,ZIndex=9,Parent=row}) cr(tb,6)
+			local function upd()
+				if item.state then tb.Text="[ON]" tb.BackgroundColor3=T.ON tb.TextColor3=Color3.fromRGB(10,10,10)
+				else tb.Text="[OFF]" tb.BackgroundColor3=T.OFF tb.TextColor3=Color3.fromRGB(255,255,255) end
+			end
+			upd()
+			local function fired() item.state=not item.state Menu.States[item.label]=item.state upd() if item.cb then pcall(item.cb,item.state) end end
+			tb.MouseButton1Click:Connect(fired) tb.TouchTap:Connect(fired)
+			table.insert(Widgets,row)
+		elseif item.t=="btn" then
+			local b=mk("TextButton",{Size=UDim2.new(1,0,0,36),BackgroundColor3=T.Btn,Text=item.label,TextColor3=T.Text,TextSize=13,Font=Enum.Font.GothamBold,LayoutOrder=i,ZIndex=8,Parent=SF})
+			cr(b,7) st(b,T.Accent,1)
+			local function fired() if item.cb then pcall(item.cb) end end
+			b.MouseButton1Click:Connect(fired) b.TouchTap:Connect(fired)
+			table.insert(Widgets,b)
+		end
+	end
+end
+for idx,name in ipairs(TabNames) do
+	local tb=mk("TextButton",{Size=UDim2.new(0,58,0,28),BackgroundColor3=T.Tab,Text=TabIcons[idx],TextSize=16,Font=Enum.Font.GothamBold,TextColor3=T.Sub,ZIndex=7,Parent=TabBar}) cr(tb,6)
+	local tip=mk("TextLabel",{Size=UDim2.new(0,0,0,18),AutomaticSize=Enum.AutomaticSize.X,Position=UDim2.new(0.5,0,1,2),AnchorPoint=Vector2.new(0.5,0),BackgroundColor3=T.Panel,Text=" "..name.." ",TextColor3=T.Accent,TextSize=10,Font=Enum.Font.GothamBold,Visible=false,ZIndex=10,Parent=tb}) cr(tip,4)
+	tb.MouseEnter:Connect(function() tip.Visible=true end) tb.MouseLeave:Connect(function() tip.Visible=false end)
+	TabBtns[name]=tb
+	tb.MouseButton1Click:Connect(function()
+		ActiveTab=name
+		for n,b in pairs(TabBtns) do
+			b.BackgroundColor3= n==name and T.TabOn or T.Tab
+			b.TextColor3= n==name and T.Text or T.Sub
+		end
+		renderTab(name)
+	end)
+end
+TabBtns[TabNames[1]].BackgroundColor3=T.TabOn TabBtns[TabNames[1]].TextColor3=T.Text
+local open=false
+local function toggle() open=not open MF.Visible=open if open then renderTab(ActiveTab) end end
+XBtn.MouseButton1Click:Connect(toggle) XBtn.TouchTap:Connect(toggle)
+OpenBtn.MouseButton1Click:Connect(toggle) OpenBtn.TouchTap:Connect(toggle)
+local conn={}
+local function addConn(tag,c) if conn[tag] then conn[tag]:Disconnect() end conn[tag]=c end
+Menu:AddSep("Main","Player")
+Menu:AddToggle("Main","Fly",false,function(s)
+	if s then
+		local bg=Instance.new("BodyGyro",root) bg.MaxTorque=Vector3.new(9e9,9e9,9e9) bg.D=100 bg.Name="FlyGyro"
+		local bv=Instance.new("BodyVelocity",root) bv.MaxForce=Vector3.new(9e9,9e9,9e9) bv.Name="FlyVel"
+		addConn("fly",RunService.Heartbeat:Connect(function()
+			if not char or not root then return end
+			bg.CFrame=workspace.CurrentCamera.CFrame
+			local d=Vector3.new()
+			if UIS:IsKeyDown(Enum.KeyCode.W) then d=d+workspace.CurrentCamera.CFrame.LookVector end
+			if UIS:IsKeyDown(Enum.KeyCode.S) then d=d-workspace.CurrentCamera.CFrame.LookVector end
+			if UIS:IsKeyDown(Enum.KeyCode.A) then d=d-workspace.CurrentCamera.CFrame.RightVector end
+			if UIS:IsKeyDown(Enum.KeyCode.D) then d=d+workspace.CurrentCamera.CFrame.RightVector end
+			if UIS:IsKeyDown(Enum.KeyCode.Space) then d=d+Vector3.new(0,1,0) end
+			if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then d=d-Vector3.new(0,1,0) end
+			bv.Velocity=d*60
+		end))
+	else
+		if conn.fly then conn.fly:Disconnect() end
+		if root:FindFirstChild("FlyGyro") then root.FlyGyro:Destroy() end
+		if root:FindFirstChild("FlyVel") then root.FlyVel:Destroy() end
+	end
+end)
+Menu:AddToggle("Main","Inf Jump",false,function(s)
+	if s then addConn("ijump",UIS.JumpRequest:Connect(function() if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end end))
+	else if conn.ijump then conn.ijump:Disconnect() end end
+end)
+Menu:AddToggle("Main","Speed Hack x2",false,function(s) if hum then hum.WalkSpeed= s and 32 or 16 end end)
+Menu:AddToggle("Main","Speed Hack x3",false,function(s) if hum then hum.WalkSpeed= s and 50 or 16 end end)
+Menu:AddToggle("Main","No Fall",false,function(s)
+	if s then addConn("nofall",RunService.Heartbeat:Connect(function() if hum then hum:ChangeState(Enum.HumanoidStateType.Running) end end))
+	else if conn.nofall then conn.nofall:Disconnect() end end
+end)
+Menu:AddToggle("Main","Inf Stamina",false,function(s)
+	if s then addConn("stamina",RunService.Heartbeat:Connect(function() if char and char:FindFirstChild("Stamina") then char.Stamina.Value=char.Stamina.MaxValue end end))
+	else if conn.stamina then conn.stamina:Disconnect() end end
+end)
+Menu:AddSep("Combat","Combat")
+Menu:AddToggle("Combat","Kill Aura",false,function(s)
+	if s then addConn("kaura",RunService.Heartbeat:Connect(function()
+		for _,p in pairs(Players:GetPlayers()) do
+			if p~=lp and p.Character and p.Character:FindFirstChild("Humanoid") and p.Character:FindFirstChild("HumanoidRootPart") then
+				local d=(root.Position-p.Character.HumanoidRootPart.Position).Magnitude
+				if d<15 then p.Character.Humanoid:TakeDamage(5) end
+			end
+		end
+	end))
+	else if conn.kaura then conn.kaura:Disconnect() end end
+end)
+Menu:AddToggle("Combat","Auto Parry",false,function(s)
+	if s then addConn("parry",RunService.Heartbeat:Connect(function()
+		for _,p in pairs(Players:GetPlayers()) do
+			if p~=lp and p.Character then
+				local pr=p.Character:FindFirstChild("ProximityPrompt")
+				if pr and pr.ActionText:lower():find("parry") then fireproximityprompt(pr) end
+			end
+		end
+	end))
+	else if conn.parry then conn.parry:Disconnect() end end
+end)
+Menu:AddButton("Combat","TP to Nearest Player",function()
+	local best,bd=nil,math.huge
+	for _,p in pairs(Players:GetPlayers()) do
+		if p~=lp and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+			local d=(root.Position-p.Character.HumanoidRootPart.Position).Magnitude
+			if d<bd then bd=d best=p end
+		end
+	end
+	if best then root.CFrame=best.Character.HumanoidRootPart.CFrame*CFrame.new(0,0,3) end
+end)
+Menu:AddSep("Move","Movement")
+Menu:AddToggle("Move","No Clip",false,function(s)
+	if s then addConn("noclip",RunService.Stepped:Connect(function()
+		if char then for _,p in pairs(char:GetDescendants()) do if p:IsA("BasePart") then p.CanCollide=false end end end
+	end))
+	else if conn.noclip then conn.noclip:Disconnect() end if char then for _,p in pairs(char:GetDescendants()) do if p:IsA("BasePart") then p.CanCollide=true end end end end
+end)
+Menu:AddToggle("Move","High Jump",false,function(s) if hum then hum.JumpPower= s and 120 or 50 end end)
+Menu:AddToggle("Move","Low Gravity",false,function(s) workspace.Gravity= s and 30 or 196.2 end)
+Menu:AddButton("Move","TP to Spawn",function()
+	local sp=workspace:FindFirstChild("SpawnLocation") or workspace:FindFirstChildOfClass("SpawnLocation")
+	if sp then root.CFrame=sp.CFrame+Vector3.new(0,5,0) end
+end)
+Menu:AddButton("Move","TP to Map Center",function() root.CFrame=CFrame.new(0,50,0) end)
+Menu:AddSep("World","World")
+Menu:AddToggle("World","Full Bright",false,function(s)
+	game:GetService("Lighting").Brightness= s and 10 or 1
+	game:GetService("Lighting").ClockTime= s and 14 or 14
+	game:GetService("Lighting").FogEnd= s and 1e6 or 1e4
+end)
+Menu:AddToggle("World","No Fog",false,function(s) game:GetService("Lighting").FogEnd= s and 1e9 or 1e4 end)
+Menu:AddToggle("World","Xray",false,function(s)
+	if char then for _,p in pairs(workspace:GetDescendants()) do
+		if p:IsA("BasePart") and not char:FindFirstChild(p.Name) then p.LocalTransparencyModifier= s and 0.7 or 0 end
+	end end
+end)
+Menu:AddToggle("World","Auto Collect Prompt",false,function(s)
+	if s then addConn("acollect",RunService.Heartbeat:Connect(function()
+		for _,v in pairs(workspace:GetDescendants()) do
+			if v:IsA("ProximityPrompt") then
+				local txt=(v.ActionText..v.ObjectText):lower()
+				if not txt:find("skip") and not txt:find("timer") then
+					pcall(function() fireproximityprompt(v) end)
+				end
+			end
+		end
+	end))
+	else if conn.acollect then conn.acollect:Disconnect() end end
+end)
+Menu:AddToggle("World","Auto Win Prompt",false,function(s)
+	if s then addConn("awin",RunService.Heartbeat:Connect(function()
+		for _,v in pairs(workspace:GetDescendants()) do
+			if v:IsA("ProximityPrompt") then
+				local txt=(v.ActionText..v.ObjectText):lower()
+				if txt:find("win") or txt:find("finish") or txt:find("escape") or txt:find("complete") then
+					pcall(function() fireproximityprompt(v) end)
+				end
+			end
+		end
+	end))
+	else if conn.awin then conn.awin:Disconnect() end end
+end)
+Menu:AddSep("Settings","Info")
+Menu:AddLabel("Settings","👤 Custom Hub v1.0")
+Menu:AddLabel("Settings","🎮 Delta VNG | Mobile Ready")
+Menu:AddSep("Settings","Options")
+Menu:AddButton("Settings","Rejoin",function() game:GetService("TeleportService"):Teleport(game.PlaceId,lp) end)
+Menu:AddButton("Settings","Reset Character",function() if hum then hum.Health=0 end end)
+Menu:AddButton("Settings","Destroy Menu",function() ScreenGui:Destroy() end)
+renderTab(ActiveTab)
+print("✅ Hub loaded!")
